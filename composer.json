@@ -13,7 +13,7 @@
   "require-dev": {},
   "autoload": {
     "psr-4": {
-      "Phper666\\HyperfServiceCommand\\": "src/"
+      "Qinmaoyi\\HyperfServiceCommand\\": "src/"
     },
     "files": [
     ]
@@ -23,7 +23,7 @@
   },
   "extra": {
     "hyperf": {
-      "config": "Phper666\\HyperfServiceCommand\\ConfigProvider"
+      "config": "Qinmaoyi\\HyperfServiceCommand\\ConfigProvider"
     }
   }
 }
