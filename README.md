@@ -1,14 +1,18 @@
-# hyperf-server-command
+# hyperf-server-command（支持php8版本）
+
 ### 注意
+
 该扩展包完全使用了FanchangWang写的代码，非常感谢FanchangWang，[FanchangWang的github地址](https://github.com/FanchangWang)     
 我是在hyperf1.2的pr查看到的这份代码，应该已经被包含hyperf1.2的命令内了，具体请看该pr[地址](https://github.com/hyperf/hyperf/pull/1053)     
 
 ### 拉取包
+
 ```
-composer require phper666/hyperf-server-command:~1.0.0
+composer require qinmaoyi/hyperf-server-command:v1.0.0
 ```
 
 hyperf的启动、重启、停止、监听等命令如下：  
+
 ```
 //php bin/hyperf.php tmg:start -d //启动服务并进入后台模式
 //php bin/hyperf.php tmg:start -c //启动服务并清除 runtime/container 目录
