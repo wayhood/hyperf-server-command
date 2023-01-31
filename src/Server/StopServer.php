@@ -12,6 +12,7 @@ use Hyperf\Command\Annotation\Command as HyperfCommand;
 /**
  * @HyperfCommand()
  */
+#[\Hyperf\Command\Annotation\Command]
 class StopServer extends Command
 {
 
