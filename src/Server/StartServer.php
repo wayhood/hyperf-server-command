@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Phper666\HyperfServiceCommand\Server;
+namespace Qinmaoyi\HyperfServiceCommand\Server;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
