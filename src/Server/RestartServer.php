@@ -20,6 +20,7 @@ use Hyperf\Command\Annotation\Command as HyperfCommand;
 /**
  * @HyperfCommand()
  */
+#[\Hyperf\Command\Annotation\Command]
 class RestartServer extends Command
 {
     /**
