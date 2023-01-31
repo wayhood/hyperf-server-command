@@ -28,6 +28,7 @@ use Hyperf\Command\Annotation\Command as HyperfCommand;
 //php bin/hyperf.php tmg:stop //停止服务
 //php bin/hyperf.php tmg:restart //重启服务
 //php bin/hyperf.php tmg:restart -c //重启服务并清除 runtime/container 目录
+#[\Hyperf\Command\Annotation\Command]
 class StartServer extends Command
 {
     /**
