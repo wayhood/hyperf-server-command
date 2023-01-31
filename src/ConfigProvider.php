@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Phper666\HyperfServiceCommand;
+namespace Qinmaoyi\HyperfServiceCommand;
 
 class ConfigProvider
 {
