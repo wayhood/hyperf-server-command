@@ -1,4 +1,4 @@
-# hyperf-server-command（支持php8版本）
+# hyperf-server-command（hyperf 3.0）
 
 ### 注意
 
