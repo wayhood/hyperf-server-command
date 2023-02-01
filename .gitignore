@@ -1,13 +1,1 @@
-.buildpath
-.settings/
-.project
-*.patch
-.idea/
-.git/
-runtime/
-vendor/
-.phpintel/
-.env
-.DS_Store
-.phpunit*
-*.cache
+.idea
