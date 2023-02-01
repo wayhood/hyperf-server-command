@@ -1,10 +1,15 @@
 {
   "name": "qinmaoyi/hyperf-server-command",
+  "description": "hyperf的启动、重启、停止、监听等命令, 适配hyperf3.0",
   "license": "MIT",
   "authors": [
     {
       "name": "liyuzhao",
       "email": "562405704@qq.com"
+    },
+    {
+      "name": "qinmaoyi",
+      "email": "675218529@qq.com"
     }
   ],
   "require": {
