@@ -8,7 +8,7 @@
 ### 拉取包
 
 ```
-composer require qinmaoyi/hyperf-server-command:v1.0.0
+composer require qinmaoyi/hyperf-server-command:v1.0.2
 ```
 
 hyperf的启动、重启、停止、监听等命令如下：  

@@ -230,7 +230,8 @@ class StartServer extends Command
         $startTime = time();
 
         while (true) {
-            if ($ret = Process::wait(false) && $ret['pid'] == $pid) {
+            $ret = Process::wait(false);
+            if ($ret && $ret['pid'] == $pid) {
                 return true;
             }
             if (!Process::kill($pid, SIG_DFL)) {
