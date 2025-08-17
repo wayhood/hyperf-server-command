@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Hyperf\Command\Annotation\Command as HyperfCommand;
 use Psr\Container\ContainerInterface;
+use Hyperf\Contract\ConfigInterface;
 
 #[HyperfCommand]
 class StopServer extends Command
