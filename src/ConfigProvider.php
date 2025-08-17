@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Qinmaoyi\HyperfServiceCommand;
+namespace Wayhood\HyperfServiceCommand;
 
 class ConfigProvider
 {
