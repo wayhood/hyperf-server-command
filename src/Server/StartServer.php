@@ -158,11 +158,6 @@ class StartServer extends Command
             throw new InvalidArgumentException('At least one server should be defined.');
         }
 
-        if ($this->daemonize) {
-            $serverConfig['settings']['daemonize'] = 1;
-            $this->io->success('swoole server start success.');
-        }
-
         if ($this->port != 9501) {
             foreach($serverConfig['servers'] as $i => $server) {
                 if ($server['name'] = 'http') {
@@ -181,11 +176,18 @@ class StartServer extends Command
             }
         }
 
+        if ($this->daemonize) {
+            $serverConfig['settings']['daemonize'] = 1;
+        }
+
         Runtime::enableCoroutine(swoole_hook_flags());
 
         $serverFactory->configure($serverConfig);
 
         $serverFactory->start();
+        if ($this->daemonize) {
+            $this->io->success('swoole server start success.');
+        }
     }
 
     private function stopServer()
