@@ -17,53 +17,37 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Hyperf\Command\Annotation\Command as HyperfCommand;
-/**
- * @HyperfCommand()
- */
+use Hyperf\Support\Composer;
+use function Hyperf\Support\swoole_hook_flags;
+
+//php bin/hyperf.php tmg:start -p 9501    //指定端口 默认查询name=http server port
+//php bin/hyperf.php tmg:start -h 0.0.0.0 //监听地址 默认查找name=http server host
 //php bin/hyperf.php tmg:start -d //启动服务并进入后台模式
 //php bin/hyperf.php tmg:start -c //启动服务并清除 runtime/container 目录
 //php bin/hyperf.php tmg:start -w //启动服务并监控 app、config目录以及 .env 变化自动重启
-//php bin/hyperf.php tmg:start -w -p /bin/php //启动 watch 服务，参数 p 指定 php 安装目录
+//php bin/hyperf.php tmg:start -w -i /bin/php //启动 watch 服务，参数 i 指定 php 安装目录
 //php bin/hyperf.php tmg:start -w -t 10  //启动 watch 服务，参数 t 指定 watch 时间间隔，单位秒
 //php bin/hyperf.php tmg:stop //停止服务
 //php bin/hyperf.php tmg:restart //重启服务
 //php bin/hyperf.php tmg:restart -c //重启服务并清除 runtime/container 目录
-#[\Hyperf\Command\Annotation\Command]
+
+#[HyperfCommand]
 class StartServer extends Command
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private SymfonyStyle $io;
 
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
+    private int $interval;
 
-    /**
-     * @var int
-     */
-    private $interval;
+    private bool $clear;
 
-    /**
-     * @var bool
-     */
-    private $clear;
+    private bool $daemonize;
 
-    /**
-     * @var bool
-     */
-    private $daemonize;
+    private string $php;
 
-    /**
-     * @var string
-     */
-    private $php;
+    private int $port;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
         parent::__construct('tmg:start');
     }
 
@@ -75,18 +59,29 @@ class StartServer extends Command
             ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false)
             ->addOption('watch', 'w', InputOption::VALUE_OPTIONAL, 'watch swoole server', false)
             ->addOption('interval', 't', InputOption::VALUE_OPTIONAL, 'interval time ( 1-15 seconds)', 3)
-            ->addOption('php', 'p', InputOption::VALUE_OPTIONAL, 'which php');
+            ->addOption('interpreter', 'i', InputOption::VALUE_OPTIONAL, 'which php path'),
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501),
+            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run port', '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $this->checkEnvironment($output);
+        if (Composer::hasPackage('hyperf/polyfill-coroutine')) {
+            $this->checkEnvironment($output);
+        }
 
         $this->stopServer();
 
         $this->clear = ($input->getOption('clear') !== false);
+
+        $this->port = (int) $input->getOption('port');
+        if ($this->port == 0) {
+            $this->port = 9501;
+        }
+
+        $this->host = $input->getOption('host');
 
         $this->daemonize = ($input->getOption('daemonize') !== false);
 
@@ -166,7 +161,25 @@ class StartServer extends Command
             $this->io->success('swoole server start success.');
         }
 
-        Runtime::enableCoroutine(true, swoole_hook_flags());
+        if ($this->port != 9501) {
+            foreach($serverConfig['servers'] as $i => $server) {
+                if ($server['name'] = 'http') {
+                    $serverConfig['servers'][$i]['port'] = $this->port;
+                    break;
+                }
+            }
+        }
+
+        if ($this->host != '0.0.0.0') {
+            foreach($serverConfig['servers'] as $i => $server) {
+                if ($server['name'] = 'http') {
+                    $serverConfig['servers'][$i]['host'] = $this->host;
+                    break;
+                }
+            }
+        }
+
+        Runtime::enableCoroutine(swoole_hook_flags());
 
         $serverFactory->configure($serverConfig);
 
@@ -175,7 +188,11 @@ class StartServer extends Command
 
     private function stopServer()
     {
-        $pidFile = BASE_PATH . '/runtime/hyperf.pid';
+        $serverConfig = $this->container->get(ConfigInterface::class)->get('server', []);
+        if (!$serverConfig) {
+            throw new InvalidArgumentException('At least one server should be defined.');
+        }
+        $pidFile = $serverConfig['settings']['pid_file'];
         $pid = file_exists($pidFile) ? intval(file_get_contents($pidFile)) : false;
         if ($pid && Process::kill($pid, SIG_DFL)) {
             if (!Process::kill($pid, SIGTERM)) {
@@ -186,6 +203,8 @@ class StartServer extends Command
             while (Process::kill($pid, SIG_DFL)) {
                 sleep(1);
             }
+        } else {
+
         }
     }
 

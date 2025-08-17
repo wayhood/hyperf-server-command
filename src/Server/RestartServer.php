@@ -17,35 +17,40 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Hyperf\Command\Annotation\Command as HyperfCommand;
-/**
- * @HyperfCommand()
- */
-#[\Hyperf\Command\Annotation\Command]
+use Hyperf\Support\Composer;
+use function Hyperf\Support\swoole_hook_flags;
+
+#[HyperfCommand]
 class RestartServer extends Command
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
         parent::__construct('tmg:restart');
     }
 
     protected function configure()
     {
         $this->setDescription('Restart hyperf servers.')
-            ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false);
+            ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false),
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501),
+            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run port', '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->checkEnvironment($output);
+        if (Composer::hasPackage('hyperf/polyfill-coroutine')) {
+            $this->checkEnvironment($output);
+        }
 
         $io = new SymfonyStyle($input, $output);
-        $pidFile = BASE_PATH . '/runtime/hyperf.pid';
+
+        $serverConfig = $this->container->get(ConfigInterface::class)->get('server', []);
+        if (!$serverConfig) {
+            throw new InvalidArgumentException('At least one server should be defined.');
+        }
+
+        $pidFile = $serverConfig['settings']['pid_file'];
+        
         $pid = file_exists($pidFile) ? intval(file_get_contents($pidFile)) : false;
         if (!$pid) {
             $io->note('swoole server pid is invalid.');
@@ -70,20 +75,41 @@ class RestartServer extends Command
             exec('rm -rf ' . BASE_PATH . '/runtime/container');
         }
 
+        $this->port = (int) $input->getOption('port');
+        if ($this->port == 0) {
+            $this->port = 9501;
+        }
+
+        $this->host = $input->getOption('host');
+
+
         $serverFactory = $this->container->get(ServerFactory::class)
             ->setEventDispatcher($this->container->get(EventDispatcherInterface::class))
             ->setLogger($this->container->get(StdoutLoggerInterface::class));
 
-        $serverConfig = $this->container->get(ConfigInterface::class)->get('server', []);
-        if (!$serverConfig) {
-            throw new InvalidArgumentException('At least one server should be defined.');
+        $serverConfig['settings']['daemonize'] = 1;
+
+        if ($this->port != 9501) {
+            foreach($serverConfig['servers'] as $i => $server) {
+                if ($server['name'] = 'http') {
+                    $serverConfig['servers'][$i]['port'] = $this->port;
+                    break;
+                }
+            }
         }
 
-        $serverConfig['settings']['daemonize'] = 1;
+        if ($this->host != '0.0.0.0') {
+            foreach($serverConfig['servers'] as $i => $server) {
+                if ($server['name'] = 'http') {
+                    $serverConfig['servers'][$i]['host'] = $this->host;
+                    break;
+                }
+            }
+        }
 
         $serverFactory->configure($serverConfig);
 
-        Runtime::enableCoroutine(true, swoole_hook_flags());
+        Runtime::enableCoroutine(swoole_hook_flags());
 
         $serverFactory->start();
         return 0;

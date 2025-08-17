@@ -1,5 +1,5 @@
 {
-  "name": "qinmaoyi/hyperf-server-command",
+  "name": "wayhood/hyperf-server-command",
   "description": "hyperf的启动、重启、停止、监听等命令, 适配hyperf3.0",
   "license": "MIT",
   "authors": [
@@ -13,22 +13,23 @@
     }
   ],
   "require": {
-    "php": ">=7.2"
+      "php": ">=8.1",
+      "hyperf/command": "~3.1.0"
   },
   "require-dev": {},
   "autoload": {
     "psr-4": {
-      "Qinmaoyi\\HyperfServiceCommand\\": "src/"
+      "Wayhood\\HyperfServiceCommand\\": "src/"
     },
     "files": [
     ]
   },
   "suggest": {
-    "hyperf/command": "required hyperf/command ~2.0.0 OR required hyperf/command ~1.1.0"
+    "hyperf/command": "required hyperf/command ~3.1"
   },
   "extra": {
     "hyperf": {
-      "config": "Qinmaoyi\\HyperfServiceCommand\\ConfigProvider"
+      "config": "Wayhood\\HyperfServiceCommand\\ConfigProvider"
     }
   }
 }

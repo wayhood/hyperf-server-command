@@ -9,14 +9,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Hyperf\Command\Annotation\Command as HyperfCommand;
-/**
- * @HyperfCommand()
- */
-#[\Hyperf\Command\Annotation\Command]
+
+#[HyperfCommand]
 class StopServer extends Command
 {
-
-    public function __construct()
+    public function __construct(private ContainerInterface $container)
     {
         parent::__construct('tmg:stop');
     }
@@ -29,7 +26,12 @@ class StopServer extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $pidFile = BASE_PATH . '/runtime/hyperf.pid';
+        $serverConfig = $this->container->get(ConfigInterface::class)->get('server', []);
+        if (!$serverConfig) {
+            throw new InvalidArgumentException('At least one server should be defined.');
+        }
+        $pidFile = $serverConfig['settings']['pid_file'];
+
         $pid = file_exists($pidFile) ? intval(file_get_contents($pidFile)) : false;
         if (!$pid) {
             $io->note('swoole server pid is invalid.');

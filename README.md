@@ -1,4 +1,4 @@
-# hyperf-server-command（hyperf 3.0）
+# hyperf-server-command（hyperf 3.1）
 
 ### 注意
 
@@ -8,7 +8,7 @@
 ### 拉取包
 
 ```
-composer require qinmaoyi/hyperf-server-command
+composer require wayhood/hyperf-server-command
 ```
 
 hyperf的启动、重启、停止、监听等命令如下：  
