@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace Qinmaoyi\HyperfServiceCommand\Server;
+namespace Wayhood\HyperfServiceCommand\Server;
 use Swoole\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
