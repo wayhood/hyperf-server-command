@@ -112,11 +112,9 @@ class RestartServer extends Command
         }
 
         $serverFactory->configure($serverConfig);
-
-        Runtime::enableCoroutine(swoole_hook_flags());
-
-        $serverFactory->start();
         $this->io->success('swoole server restart success.');
+        Runtime::enableCoroutine(swoole_hook_flags());
+        $serverFactory->start();
         return 0;
     }
 

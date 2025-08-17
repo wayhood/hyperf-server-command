@@ -178,6 +178,7 @@ class StartServer extends Command
 
         if ($this->daemonize) {
             $serverConfig['settings']['daemonize'] = 1;
+            $this->io->success('swoole server start success.');
         }
 
         Runtime::enableCoroutine(swoole_hook_flags());
@@ -185,9 +186,6 @@ class StartServer extends Command
         $serverFactory->configure($serverConfig);
 
         $serverFactory->start();
-        if ($this->daemonize) {
-            $this->io->success('swoole server start success.');
-        }
     }
 
     private function stopServer()
