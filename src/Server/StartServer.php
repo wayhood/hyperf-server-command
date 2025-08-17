@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Qinmaoyi\HyperfServiceCommand\Server;
+namespace Wayhood\HyperfServiceCommand\Server;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -59,9 +59,9 @@ class StartServer extends Command
             ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false)
             ->addOption('watch', 'w', InputOption::VALUE_OPTIONAL, 'watch swoole server', false)
             ->addOption('interval', 't', InputOption::VALUE_OPTIONAL, 'interval time ( 1-15 seconds)', 3)
-            ->addOption('interpreter', 'i', InputOption::VALUE_OPTIONAL, 'which php path'),
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501),
-            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run port', '0.0.0.0');
+            ->addOption('interpreter', 'i', InputOption::VALUE_OPTIONAL, 'which php path')
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501)
+            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run host', '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

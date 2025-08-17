@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Qinmaoyi\HyperfServiceCommand\Server;
+namespace Wayhood\HyperfServiceCommand\Server;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -31,9 +31,9 @@ class RestartServer extends Command
     protected function configure()
     {
         $this->setDescription('Restart hyperf servers.')
-            ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false),
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501),
-            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run port', '0.0.0.0');
+            ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false)
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501)
+            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run host', '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
