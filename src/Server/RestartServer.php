@@ -23,6 +23,10 @@ use function Hyperf\Support\swoole_hook_flags;
 #[HyperfCommand]
 class RestartServer extends Command
 {
+    private int $port;
+
+    private string $address;
+
     public function __construct(private ContainerInterface $container)
     {
         parent::__construct('tmg:restart');
@@ -32,8 +36,8 @@ class RestartServer extends Command
     {
         $this->setDescription('Restart hyperf servers.')
             ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false)
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501)
-            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run host', '0.0.0.0');
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'bind port', 9501)
+            ->addOption('address', 'a', InputOption::VALUE_OPTIONAL, 'bind address', '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -80,7 +84,7 @@ class RestartServer extends Command
             $this->port = 9501;
         }
 
-        $this->host = $input->getOption('host');
+        $this->address = $input->getOption('address');
 
 
         $serverFactory = $this->container->get(ServerFactory::class)
@@ -98,10 +102,10 @@ class RestartServer extends Command
             }
         }
 
-        if ($this->host != '0.0.0.0') {
+        if ($this->address != '0.0.0.0') {
             foreach($serverConfig['servers'] as $i => $server) {
                 if ($server['name'] = 'http') {
-                    $serverConfig['servers'][$i]['host'] = $this->host;
+                    $serverConfig['servers'][$i]['host'] = $this->address;
                     break;
                 }
             }

@@ -21,7 +21,7 @@ use Hyperf\Support\Composer;
 use function Hyperf\Support\swoole_hook_flags;
 
 //php bin/hyperf.php tmg:start -p 9501    //指定端口 默认查询name=http server port
-//php bin/hyperf.php tmg:start -h 0.0.0.0 //监听地址 默认查找name=http server host
+//php bin/hyperf.php tmg:start -a 0.0.0.0 //监听地址 默认查找name=http server host
 //php bin/hyperf.php tmg:start -d //启动服务并进入后台模式
 //php bin/hyperf.php tmg:start -c //启动服务并清除 runtime/container 目录
 //php bin/hyperf.php tmg:start -w //启动服务并监控 app、config目录以及 .env 变化自动重启
@@ -42,9 +42,11 @@ class StartServer extends Command
 
     private bool $daemonize;
 
-    private string $php;
+    private string $interpreter;
 
     private int $port;
+
+    private string $address;
 
     public function __construct(private ContainerInterface $container)
     {
@@ -59,9 +61,9 @@ class StartServer extends Command
             ->addOption('clear', 'c', InputOption::VALUE_OPTIONAL, 'clear runtime container', false)
             ->addOption('watch', 'w', InputOption::VALUE_OPTIONAL, 'watch swoole server', false)
             ->addOption('interval', 't', InputOption::VALUE_OPTIONAL, 'interval time ( 1-15 seconds)', 3)
-            ->addOption('interpreter', 'i', InputOption::VALUE_OPTIONAL, 'which php path')
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'run port', 9501)
-            ->addOption('host', 'h', InputOption::VALUE_OPTIONAL, 'run host', '0.0.0.0');
+            ->addOption('interpreter', 'i', InputOption::VALUE_OPTIONAL, 'which php interpreter path')
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'bind port', 9501)
+            ->addOption('address', 'a', InputOption::VALUE_OPTIONAL, 'bind address', '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -81,7 +83,7 @@ class StartServer extends Command
             $this->port = 9501;
         }
 
-        $this->host = $input->getOption('host');
+        $this->address = $input->getOption('address');
 
         $this->daemonize = ($input->getOption('daemonize') !== false);
 
@@ -91,9 +93,9 @@ class StartServer extends Command
             if ($this->interval < 0 || $this->interval > 15) {
                 $this->interval = 3;
             }
-            if (!$this->php = $input->getOption('php')) {
-                if (!$this->php = exec('which php')) {
-                    $this->php = 'php';
+            if (!$this->interpreter = $input->getOption('interpreter')) {
+                if (!$this->interpreter = exec('which php')) {
+                    $this->interpreter = 'php';
                 }
             }
             $this->watchServer();
@@ -170,10 +172,10 @@ class StartServer extends Command
             }
         }
 
-        if ($this->host != '0.0.0.0') {
+        if ($this->address != '0.0.0.0') {
             foreach($serverConfig['servers'] as $i => $server) {
                 if ($server['name'] = 'http') {
-                    $serverConfig['servers'][$i]['host'] = $this->host;
+                    $serverConfig['servers'][$i]['host'] = $this->address;
                     break;
                 }
             }
@@ -236,7 +238,7 @@ class StartServer extends Command
             if ($this->daemonize) {
                 $args[] = '-d';
             }
-            $process->exec($this->php, $args);
+            $process->exec($this->interpreter, $args);
         });
         return $process->start();
     }
