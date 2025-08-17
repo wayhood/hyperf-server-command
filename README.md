@@ -6,7 +6,7 @@
 * 未安装适配协程插件，不检查 swoole.use_shortname
 * php bin/hyperf.php tmg:start -p 9501    //指定端口 默认查询name=http server port
 * php bin/hyperf.php tmg:start -a 0.0.0.0 //监听地址 默认查找name=http server host
-* php bin/hyperf.php tmg:start -w -i /bin/php //启动 watch 服务，参数 p 指定 php 安装目录
+* php bin/hyperf.php tmg:start -w -i /bin/php //启动 watch 服务，参数 i(interpreter) 指定 php 安装目录
 
 ### 注意
 
